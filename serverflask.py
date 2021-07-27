@@ -91,4 +91,4 @@ def nombre(modelo, positiveconcepts, negativeconcepts, number):
 #     if request.method == 'POST':
 
 
-app.run(host='0.0.0.0', port=int("80"))
+app.run(host='0.0.0.0', port=int("8080"))
