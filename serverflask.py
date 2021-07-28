@@ -3,14 +3,18 @@ import numpy as np
 import recommender
 import re
 
-def procesar_conceptos(conceptos):
-    conceptos_sin_puntoycoma = re.split(';', conceptos)
-    resultado = []
-    for concept in conceptos_sin_puntoycoma:
-        lista = re.split(',', concept)
-        resultado.append(lista)
-    return resultado
-    
+def process_concepts(concepts):
+    concepts_without_semicolon = re.split(';', concepts)
+    result = []
+    for concept in concepts_without_semicolon:
+        list_without_commas = re.split(',', concept)
+        result.append(list_without_commas)
+    return result
+
+def process_negative_concepts(negative_concepts):
+    concepts_without_commas = re.split(',', negative_concepts)  
+    return concepts_without_commas
+
 def load_glove(path):
     embeddings_dict = {}
     with open(path, 'r', encoding='utf-8') as f:
@@ -48,47 +52,62 @@ class MyFlaskApp(Flask):
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
 app = MyFlaskApp(__name__)
-prefijo = '/model-autocompletion' # Change to the URL prefix you need
-app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=prefijo)
+my_prefix = '/model-autocompletion' # Change to the URL prefix you need
+app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=my_prefix)
 
 @app.route('/')
 def index():
     return '<h1>I am the Flask Server, currently running</h1>'
 
-@app.route('/<modelo>/<positiveconcepts>/<negativeconcepts>/<number>')
-def nombre(modelo, positiveconcepts, negativeconcepts, number):
-    sugerencias = []
-    positiveconceptsprocessed = []
-    negativeconceptsprocessed = []
-    errores = "No hay errores"
-    print(positiveconcepts)
-    print(negativeconcepts)
-    if positiveconcepts: #La lista tiene elementos
-        positiveconceptsprocessed = procesar_conceptos(positiveconcepts)
-    print(positiveconceptsprocessed)    
-    if negativeconcepts: #La lista tiene elementos
-        negativeconceptsprocessed = procesar_conceptos(negativeconcepts)
+@app.route('/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>')
+def query(model, positive_concepts, negative_concepts, number, together):
+    suggestions = []
+    suggestions_second_model = []
+    positive_concepts_processed = []
+    negative_concepts_processed = []
+    log = ""
+    result = ''
+    
+    if positive_concepts: #Positive concepts list is not empty
+        positive_concepts_processed = process_concepts(positive_concepts)
         
-    if modelo == "general" and positiveconceptsprocessed and number: #Comprobacion de que number no es nulo
-    #Falta por aÃ±adir los conceptos negativos
-        for slice in positiveconceptsprocessed:
-            sugerencias = recommender.get_suggestions(general_embeddings_dict, slice, [], int(number))
+    if negative_concepts: #Negative concepts list is not empty
+        negative_concepts_processed = process_negative_concepts(negative_concepts)
+        
+    if model == "general" and positive_concepts_processed and number: #Checking number is not null
+        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+        result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+    elif model == "conceptual" and positive_concepts_processed and number:
+        suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+        result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+    elif model == "general;conceptual" and positive_concepts_processed and number and together:
+        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+        suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+        if int(together) == 1:
+            result = '<h1>Suggestions are: {}</h1>'.format(suggestions + suggestions_second_model)
+        else:
+            result = '<h1>Suggestions are: general: {}, contextual: {}</h1>'.format(suggestions, suggestions_second_model)
     else:
-        errores = "Procesando el modelo general ha habido algun error"
+        log = "No model has been specified"
         
-    if modelo == "conceptual" and positiveconceptsprocessed and number:
-    #Falta por aÃ±adir los conceptos negativos
-        for slice in positiveconceptsprocessed:
-            sugerencias = recommender.get_suggestions(contextual_embeddings_dict, slice, [], int(number))
-    else:
-        errores = "Procesando el modelo conceptual ha habido algun error"
-        
-    return '<h1>Errores: {} <br> Las sugerencias son: {}</h1>'.format(errores, sugerencias)
+    return '<h1>Log: {}</h1>'.format(log) + result
 
 # allow both GET and POST requests
 #@app.route('/form-example', methods=['GET', 'POST'])
 #def form_example():
 #     if request.method == 'POST':
+def find_general_suggestions(positive_concepts, negative_concepts, number):
+    suggestions = []
+    for slice in positive_concepts:
+        suggestions = recommender.get_suggestions(general_embeddings_dict, slice, negative_concepts, number)
+    return suggestions 
 
+def find_contextual_suggestions(positive_concepts, negative_concepts, number):
+    #Positive concepts come from a partial model
+    #Negative concepts are just words
+    suggestions = []
+    for slice in positive_concepts:
+       suggestions = recommender.get_suggestions(contextual_embeddings_dict, slice, negative_concepts, number)
+    return suggestions
 
-app.run(host='172.17.0.2', port=int("81"))
+app.run(host='0.0.0.0', port=8080)
