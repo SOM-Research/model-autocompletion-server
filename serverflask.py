@@ -47,7 +47,7 @@ class MyFlaskApp(Flask):
     if not self.debug or os.getenv('WERKZEUG_RUN_MAIN') == 'true':
       with self.app_context():
         global general_embeddings_dict, contextual_embeddings_dict
-        general_embeddings_dict = load_glove("general.txt")
+        general_embeddings_dict = load_glove("glove.6B.300d.txt")
         contextual_embeddings_dict = load_glove("vectors_emasa_en.txt")
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
