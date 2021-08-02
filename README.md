@@ -28,6 +28,7 @@ Tool for the autocompletion of partial domain models.
 ### Requirements
 
 - You need to install Docker (version 20.10.7) on your computer. Ubuntu users follow this tutorial (steps 1-6): https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04 / Windows users follow this tutorial, it may not be available for Windows 10 Home users: https://www.youtube.com/watch?v=5nX8U8Fz5S0 
+- Download GloVe's general embeddings dictionary from the official site: https://nlp.stanford.edu/projects/glove/ We use Wikipedia 2014 + Gigaword 5 (6B tokens, 400K vocab, uncased, 50d, 100d, 200d, & 300d vectors, 822 MB download), file name: ```glove.6B.zip```. Unzip the folder and copy the file ```glove.6B.300d.txt``` to the folder where this repository will be cloned.
 
 ### Configure Eclipse for client development ?
 
