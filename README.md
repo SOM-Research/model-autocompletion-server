@@ -37,8 +37,8 @@ Before starting this tutorial, make sure to have installed the software mentione
 
 1. Clone our repository.
 2. Open a command-line interpreter and navigate to the folder where this repository is located.
-3. Execute the command: "docker build -t imageName ." assign a name to the image that will be executed, for example, model-autocompletion. This command will run the content stored in Dockerfile.
-4.  Now, execute: "docker run -it imageName". This command will open an internal command-line interpreter for Ubuntu 20.04 (specified in Dockerfile). 
+3. Execute the command: ```docker build -t imageName .``` assign a name to the image that will be executed, for example, model-autocompletion. This command will run the content stored in Dockerfile.
+4.  Now, execute: ```docker run -it imageName``` This command will open an internal command-line interpreter for Ubuntu 20.04 (specified in Dockerfile). 
 
 ## Citations
 
