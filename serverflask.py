@@ -77,10 +77,10 @@ def query(model, positive_concepts, negative_concepts, number, together):
     if model == "general" and positive_concepts_processed and number: #Checking number is not null
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
-    elif model == "conceptual" and positive_concepts_processed and number:
+    elif model == "contextual" and positive_concepts_processed and number:
         suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
-    elif model == "general;conceptual" and positive_concepts_processed and number and together:
+    elif model == "general;contextual" and positive_concepts_processed and number and together:
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if int(together) == 1:
