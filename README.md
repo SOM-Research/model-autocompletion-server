@@ -40,6 +40,9 @@ Before starting this tutorial, make sure to have installed the software mentione
 2. Open a command-line interpreter and navigate to the folder where this repository is located.
 3. Execute the command: ```docker build -t imageName .``` assign a name to the image that will be executed, for example, model-autocompletion. This command will run the content stored in Dockerfile. If it appears ```permissions denied```, execute: ```sudo chmod 666 /var/run/docker.sock```.
 4.  Now, execute: ```docker run -it imageName``` This command will open an internal command-line interpreter for Ubuntu 20.04 (specified in Dockerfile). 
+5.  To start the Flask server, in the internal command-line interpreter type: ```python3 serverflask.py```
+6.  To make queries to the local server open your browser and write the URL that appears inside the command-line interpreter: ![URL server](https://user-images.githubusercontent.com/50658372/127834030-dea9ed89-3651-4a9a-bad1-c25dd88589ae.png)
+
 
 ## Citations
 
