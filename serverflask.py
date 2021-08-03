@@ -1,6 +1,6 @@
 from flask import Flask,request 
 import numpy as np
-import recommender
+import recommender as recommendations
 import re
 
 def process_concepts(concepts):
@@ -76,17 +76,27 @@ def query(model, positive_concepts, negative_concepts, number, together):
         
     if model == "general" and positive_concepts_processed and number: #Checking number is not null
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
-        result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+        if suggestions:
+            result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+        else:
+            log = 'No suggestions were found in the general model'
     elif model == "contextual" and positive_concepts_processed and number:
         suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
-        result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+        if suggestions:
+            result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+        else:
+            log = 'No suggestions were found in the contextual model'
     elif model == "general;contextual" and positive_concepts_processed and number and together:
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if int(together) == 1:
             result = '<h1>Suggestions are: {}</h1>'.format(suggestions + suggestions_second_model)
         else:
-            result = '<h1>Suggestions are: general: {}, contextual: {}</h1>'.format(suggestions, suggestions_second_model)
+            if suggestions_second_model:
+                result = '<h1>Suggestions are: general: {}, contextual: {}</h1>'.format(suggestions, suggestions_second_model)
+            else:
+                result = '<h1>Suggestions are: general: {}</h1>'.format(suggestions)
+                log = 'No suggestions were found in the contextual model' 
     else:
         log = "No model has been specified"
         
@@ -99,7 +109,7 @@ def query(model, positive_concepts, negative_concepts, number, together):
 def find_general_suggestions(positive_concepts, negative_concepts, number):
     suggestions = []
     for slice in positive_concepts:
-        suggestions = recommender.get_suggestions(general_embeddings_dict, slice, negative_concepts, number)
+        suggestions = recommendations.get_suggestions(general_embeddings_dict, slice, negative_concepts, number)
     return suggestions 
 
 def find_contextual_suggestions(positive_concepts, negative_concepts, number):
@@ -107,7 +117,7 @@ def find_contextual_suggestions(positive_concepts, negative_concepts, number):
     #Negative concepts are just words
     suggestions = []
     for slice in positive_concepts:
-       suggestions = recommender.get_suggestions(contextual_embeddings_dict, slice, negative_concepts, number)
+        suggestions = recommendations.get_suggestions(contextual_embeddings_dict, slice, negative_concepts, number)
     return suggestions
 
 app.run(host='0.0.0.0', port=8080)
