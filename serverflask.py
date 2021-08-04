@@ -1,7 +1,11 @@
-from flask import Flask,request 
+from flask import Flask,request, redirect, flash, url_for 
+from werkzeug.utils import secure_filename
+import os
 import numpy as np
 import recommender as recommendations
+import lemmatizer as lemmas
 import re
+
 
 def process_concepts(concepts):
     concepts_without_semicolon = re.split(';', concepts)
@@ -51,13 +55,67 @@ class MyFlaskApp(Flask):
         contextual_embeddings_dict = load_glove("vectors_emasa_en.txt")
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
+
+UPLOAD_FOLDER = '/files/'
+ALLOWED_EXTENSIONS = {'txt'}
+
 app = MyFlaskApp(__name__)
 my_prefix = '/model-autocompletion' # Change to the URL prefix you need
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=my_prefix)
+
 
 @app.route('/')
 def index():
     return '<h1>I am the Flask Server, currently running</h1>'
+
+def find(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/pre-process-text', methods=['POST'])
+def preprocessing():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            print('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            print('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            print('Saved')
+            path = find(filename, UPLOAD_FOLDER)
+            print(path)
+
+            tokenized = lemmas.tokenize_text(path) #tokenizing text
+            tokenized = [lemmas.remove_punctuation(i) for i in tokenized] #removing punctuation symbols from the tokenized text
+            filtered_and_tokenized = [elem for elem in tokenized if elem != ''] #removing empty elements from the list
+            print("After removing punctuation and empty elements")
+            print(filtered_and_tokenized)
+            lemmatized_list = lemmas.lemmatize_list(filtered_and_tokenized)
+            print("Now it has been lemmatized")
+            print(lemmatized_list)
+    return '''
+    <!doctype html>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    '''
+    
 
 @app.route('/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>')
 def query(model, positive_concepts, negative_concepts, number, together):

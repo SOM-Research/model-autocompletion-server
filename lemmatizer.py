@@ -1,6 +1,28 @@
-import nltk
-from nltk.corpus import wordnet as wn
+
+from nltk.corpus import wordnet as wn, stopwords
+from nltk.tokenize import word_tokenize
+import nltk 
 nltk.download('wordnet')
+nltk.download('stopwords')
+nltk.download('punkt')
+
+def remove_punctuation(string):
+    punctuation = '''!()-[]{};:'"\, <>./?@#$%^&*_~—'''
+    for ele in string:  
+        if ele in punctuation:  
+            string = string.replace(ele, "") 
+    return string
+
+def tokenize_text(path):
+    stop_words = set(stopwords.words('english'))
+    filtered_sentence = []
+    with open(path, 'r', encoding='utf-8') as f:
+        for line in f:
+            word_tokens = word_tokenize(line)
+            for w in word_tokens:
+                if w not in stop_words:
+                    filtered_sentence.append(w)
+    return filtered_sentence 
 
 def exists_in_wordnet(word):
     return len(wn.synsets(word)) > 0
@@ -35,6 +57,14 @@ def is_verb(input_word):
 def is_noun(input_word):
     pos = get_pos(input_word)
     return 'n' in pos
+
+def lemmatize_list(list):
+    result = []
+    for word in list:
+        lemmatized = lemmatize(word)
+        if lemmatized != None:
+            result.append(lemmatized)
+    return result
 
 def lemmatize(input_word):
     m = wn.morphy(input_word)
