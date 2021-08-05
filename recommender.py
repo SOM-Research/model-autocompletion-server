@@ -52,7 +52,7 @@ def get_glove_recommendations(glove_emb_dict, positiveconcepts, negativeconcepts
 
 
 def get_suggestions(glove_emb_dict, positiveconcepts, negativeconcepts, num):
-    concepts = lower(positiveconcepts)
+    concepts = lemmas.lower(positiveconcepts)
     glove_suggestions = get_glove_recommendations(glove_emb_dict, concepts, negativeconcepts, num)
 
     wordnet_words = []
@@ -69,5 +69,4 @@ def get_suggestions(glove_emb_dict, positiveconcepts, negativeconcepts, num):
     wordnet_words = lemmas.removePlurals(wordnet_words)
     return wordnet_words
 
-def lower(x):
-    return [element.lower() for element in x] ; 
+

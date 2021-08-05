@@ -100,12 +100,13 @@ def preprocessing():
 
             tokenized = lemmas.tokenize_text(path) #tokenizing text
             tokenized = [lemmas.remove_punctuation(i) for i in tokenized] #removing punctuation symbols from the tokenized text
+            #tokenized = lemmas.lower(tokenized)
             filtered_and_tokenized = [elem for elem in tokenized if elem != ''] #removing empty elements from the list
             print("After removing punctuation and empty elements")
             print(filtered_and_tokenized)
-            lemmatized_list = lemmas.lemmatize_list(filtered_and_tokenized)
-            print("Now it has been lemmatized")
-            print(lemmatized_list)
+            #lemmatized_list = lemmas.lemmatize_list(filtered_and_tokenized)
+            #print("Now it has been lemmatized")
+            #print(lemmatized_list)
     return '''
     <!doctype html>
     <title>Upload new File</title>
@@ -115,7 +116,7 @@ def preprocessing():
       <input type=submit value=Upload>
     </form>
     '''
-    
+#TO DO: DECIDE WHAT TO DO WITH RETURN    
 
 @app.route('/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>')
 def query(model, positive_concepts, negative_concepts, number, together):
