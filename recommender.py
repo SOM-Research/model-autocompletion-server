@@ -65,8 +65,8 @@ def get_suggestions(glove_emb_dict, positiveconcepts, negativeconcepts, num):
     wordnet_words = [ele for ele in wordnet_words if ele not in concepts] # remove words that are already present
     wordnet_words = [ele for ele in wordnet_words if ele not in negativeconcepts] # remove words that are negative words
 
-    wordnet_words = lemmas.removeVerbs(wordnet_words)
-    wordnet_words = lemmas.removePlurals(wordnet_words)
+    wordnet_words = lemmas.remove_verbs(wordnet_words)
+    wordnet_words = lemmas.remove_plurals(wordnet_words)
     return wordnet_words
 
 

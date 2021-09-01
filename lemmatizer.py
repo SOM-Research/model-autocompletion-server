@@ -129,13 +129,21 @@ cList = {
   "you've": "you have"
 }
 
+subjects = {"i", "you", "he", "she", "it", "we", "they"}
+
 c_re = re.compile('(%s)' % '|'.join(cList.keys()))
 
-def expandContractions(text, c_re=c_re):
+def expand_contractions(text, c_re=c_re):
     def replace(match):
         return cList[match.group(0)]
     return c_re.sub(replace, text.lower())
 
+def remove_subjects(list):
+    list_without_subjects = []
+    for item in list:
+        if not item.lower() in subjects:
+            list_without_subjects.append(item)
+    return list_without_subjects
 
 def remove_punctuation(string):
     punctuation = '''!()-[]{};:`'"\, <>./?@#$%^&*_~—'''
@@ -149,7 +157,7 @@ def tokenize_text(path):
     filtered_sentence = []
     with open(path, 'r', encoding='utf-8') as f:
         for line in f:
-            expanded = expandContractions(line)
+            expanded = expand_contractions(line)
             word_tokens = word_tokenize(expanded)
             for w in word_tokens:
                 if w not in stop_words:
@@ -217,7 +225,7 @@ def lemmatize_as_noun(input_word):
     m = wn.morphy(input_word, wn.NOUN)
     return m
 
-def isplural(word):
+def is_plural(word):
     lemma = wn.morphy(word, 'n')
     plural = True if word is not lemma else False
     return plural
@@ -233,21 +241,19 @@ def process_with_wordnet_multiple_lemmatizing(input_word):
         result.append(word)
     return result # it will return None if after lemmatization the word doesnt exist
 
-def removeVerbs(list):
+def remove_verbs(list):
     result = []
     for w in list:
         if not (is_verb(w) and (not is_noun(w))):
             result.append(w)
     return result
     
-def removePlurals(list):
+def remove_plurals(list):
     result = []
     for w in list:
-        if not isplural(w):
+        if not is_plural(w):
             result.append(w)
     return result
 
-'''
 def lower(x):
     return [element.lower() for element in x] ; 
-'''

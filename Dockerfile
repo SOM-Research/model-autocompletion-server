@@ -10,3 +10,4 @@ RUN pip install numpy
 RUN pip install scipy
 RUN pip install nltk
 RUN pip install flask
+RUN mkdir files

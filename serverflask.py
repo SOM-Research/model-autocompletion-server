@@ -56,8 +56,8 @@ class MyFlaskApp(Flask):
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
 
-UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/'
-#UPLOAD_FOLDER = '/files/'
+#UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER
+UPLOAD_FOLDER = '/files/'
 ALLOWED_EXTENSIONS = {'txt'}
 
 app = MyFlaskApp(__name__)
@@ -105,18 +105,15 @@ def preprocessing():
             filtered_and_tokenized = [elem for elem in tokenized if elem != ''] #removing empty elements from the list
             print("After removing punctuation and empty elements")
             print(filtered_and_tokenized)
+
+            filtered_tokenized_no_subjects = lemmas.remove_subjects(filtered_and_tokenized) #removing subjects from the list
+            print("After removing subjects the content is:")
+            print(filtered_tokenized_no_subjects)
+            #TO DO: WHEN DO WE DO LEMMATIZATION?
             #lemmatized_list = lemmas.lemmatize_list(filtered_and_tokenized)
             #print("Now it has been lemmatized")
             #print(lemmatized_list)
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+    return ''' DONE '''
 #TO DO: DECIDE WHAT TO DO WITH RETURN    
 
 @app.route('/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>')
@@ -127,28 +124,32 @@ def query(model, positive_concepts, negative_concepts, number, together):
     negative_concepts_processed = []
     log = ""
     result = ''
-    
+    suggestions_number = 0
+    double_suggestions = 2
+    if  number: #Checking number is not null
+        suggestions_number = double_suggestions*int(number)
+
     if positive_concepts: #Positive concepts list is not empty
         positive_concepts_processed = process_concepts(positive_concepts)
         
     if negative_concepts: #Negative concepts list is not empty
         negative_concepts_processed = process_negative_concepts(negative_concepts)
         
-    if model == "general" and positive_concepts_processed and number: #Checking number is not null
-        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+    if model == "general" and positive_concepts_processed: 
+        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
         if suggestions:
             result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
         else:
             log = 'No suggestions were found in the general model'
-    elif model == "contextual" and positive_concepts_processed and number:
-        suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+    elif model == "contextual" and positive_concepts_processed:
+        suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
         if suggestions:
             result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
         else:
             log = 'No suggestions were found in the contextual model'
-    elif model == "general;contextual" and positive_concepts_processed and number and together:
-        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
-        suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+    elif model == "general;contextual" and positive_concepts_processed and together:
+        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
+        suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
         if int(together) == 1:
             result = '<h1>Suggestions are: {}</h1>'.format(suggestions + suggestions_second_model)
         else:
@@ -162,10 +163,6 @@ def query(model, positive_concepts, negative_concepts, number, together):
         
     return '<h1>Log: {}</h1>'.format(log) + result
 
-# allow both GET and POST requests
-#@app.route('/form-example', methods=['GET', 'POST'])
-#def form_example():
-#     if request.method == 'POST':
 def find_general_suggestions(positive_concepts, negative_concepts, number):
     suggestions = []
     for slice in positive_concepts:
