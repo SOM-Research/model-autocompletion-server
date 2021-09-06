@@ -7,6 +7,7 @@ def find_closest_embeddings(glove_emb_dict, embedding):
 
 def find_closest_concepts(glove_emb_dict, positiveconcepts, negativeconcepts, num):
     try:
+        concepts_number = 2*num
         embeddings = glove_emb_dict[positiveconcepts[0]]
         for t in positiveconcepts: #range(1, len(concepts)):
             if t in glove_emb_dict:
@@ -14,7 +15,7 @@ def find_closest_concepts(glove_emb_dict, positiveconcepts, negativeconcepts, nu
         for t in negativeconcepts:
             if t in glove_emb_dict:
                 embeddings = embeddings - glove_emb_dict[t]
-        closest_terms = find_closest_embeddings(glove_emb_dict, embeddings)[:num] 
+        closest_terms = find_closest_embeddings(glove_emb_dict, embeddings)[:concepts_number] 
         # closest_terms = set(closest_terms) - set(concepts) # remove words that we already have
         return closest_terms
     except Exception as e:

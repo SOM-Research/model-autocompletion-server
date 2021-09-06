@@ -124,34 +124,30 @@ def query(model, positive_concepts, negative_concepts, number, together):
     negative_concepts_processed = []
     log = ""
     result = ''
-    suggestions_number = 0
-    double_suggestions = 2
-    if  number: #Checking number is not null
-        suggestions_number = double_suggestions*int(number)
-
+   
     if positive_concepts: #Positive concepts list is not empty
         positive_concepts_processed = process_concepts(positive_concepts)
         
     if negative_concepts: #Negative concepts list is not empty
         negative_concepts_processed = process_negative_concepts(negative_concepts)
         
-    if model == "general" and positive_concepts_processed: 
-        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
+    if model == "general" and positive_concepts_processed and number: 
+        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if suggestions:
             result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
         else:
             log = 'No suggestions were found in the general model'
-    elif model == "contextual" and positive_concepts_processed:
-        suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
+    elif model == "contextual" and positive_concepts_processed and number:
+        suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if suggestions:
             result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
         else:
             log = 'No suggestions were found in the contextual model'
-    elif model == "general;contextual" and positive_concepts_processed and together:
-        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
-        suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, suggestions_number)[:int(number)]
+    elif model == "general;contextual" and positive_concepts_processed and together and number:
+        suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
+        suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if int(together) == 1:
-            result = '<h1>Suggestions are: {}</h1>'.format(suggestions + suggestions_second_model)
+            result = '<h1>Suggestions are: {} length 1: {} length 2: {}</h1>'.format(suggestions + suggestions_second_model, len(suggestions), len(suggestions_second_model))
         else:
             if suggestions_second_model:
                 result = '<h1>Suggestions are: general: {}, contextual: {}</h1>'.format(suggestions, suggestions_second_model)
@@ -167,7 +163,7 @@ def find_general_suggestions(positive_concepts, negative_concepts, number):
     suggestions = []
     for slice in positive_concepts:
         suggestions = recommendations.get_suggestions(general_embeddings_dict, slice, negative_concepts, number)
-    return suggestions 
+    return suggestions[:number] 
 
 def find_contextual_suggestions(positive_concepts, negative_concepts, number):
     #Positive concepts come from a partial model
@@ -175,6 +171,6 @@ def find_contextual_suggestions(positive_concepts, negative_concepts, number):
     suggestions = []
     for slice in positive_concepts:
         suggestions = recommendations.get_suggestions(contextual_embeddings_dict, slice, negative_concepts, number)
-    return suggestions
+    return suggestions[:number]
 
 app.run(host='0.0.0.0', port=8080)
