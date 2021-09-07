@@ -38,15 +38,16 @@ If it's your first time using our repository, follow these steps:
 1. Clone our repository.
 2. Open a command-line interpreter and navigate to the folder where this repository is located.
 3. Execute the command: ```docker build -t imageName .``` assign a name to the image that will be executed, for example, model-autocompletion. This command will run the content stored in Dockerfile. If it appears ```permissions denied```, execute: ```sudo chmod 666 /var/run/docker.sock```.
-4.  Now, execute: ```docker run -it imageName``` This command will open an internal command-line interpreter for Ubuntu 20.04 (specified in Dockerfile). 
+4.  Now, if you are running Docker on Linux as your host system, execute: ```docker run -it imageName```. Otherwise, if your host OS is Windows, execute: ```docker run -p 8080:8080 -it imageName```. This command will open an internal command-line interpreter for Ubuntu 20.04 (specified in Dockerfile). 
 5.  To start the Flask server, in the internal command-line interpreter type: ```python3 serverflask.py```
-6.  To make queries to the local server, open your browser and write the URL that appears inside the command-line interpreter: ![URL server](https://user-images.githubusercontent.com/50658372/127834030-dea9ed89-3651-4a9a-bad1-c25dd88589ae.png) Using the URL in the example, the query will have this structure: ```http://172.17.0.2:8080/model-autocompletion/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>```
+6.  To make queries to the local server, open your browser and write the URL that appears inside the command-line interpreter: ![URL server](https://user-images.githubusercontent.com/50658372/127834030-dea9ed89-3651-4a9a-bad1-c25dd88589ae.png) Using the URL in the example, the query will have this structure: ```http://172.17.0.2:8080/model-autocompletion/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>``` Windows users don't have to use the IP shown in the screenshot. Instead, you must write ```localhost```.
   - ```<model>```: you must specify from which model you want our suggestions. Possible values: ```general``` if you want suggestions from the general knowledge, ```contextual``` if you want suggestions from the contextual knowledge, ```general;contextual``` if you want suggestions from both sources of knowledge.
   - ```<positive_concepts>```: here you put the model's slices using the format: slice1term1,slice1term2,slice1term3;slice2term1,slice2term2;slice3term1
   - ```<negative_concepts>```: here you put the historical data (words discarded by the user) using the format: word1,word2,word3...
   - ```<number>```: you specify the number of suggestions you want.
   - ```<together>```: in case you want suggestions from both sources of knowledge, you have to specify here if you want to see the suggestions together or not. Possible values: ```1``` to see the suggestions together, ```0``` to see the suggestions provided by each source of knowledge.
-  Example query: http://172.17.0.2:8080/model-autocompletion/general;contextual/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
+  Example query (Linux users): http://172.17.0.2:8080/model-autocompletion/general;contextual/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
+  Example query (Windows users): http://localhost:8080/model-autocompletion/general;contextual/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
   Result: ![result](https://user-images.githubusercontent.com/50658372/127837543-9c0a5d91-dc88-41be-b07f-4543b9c7b43a.png)
 7. To go out of the internal command-line interpreter type: ```exit```
 8. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. 
