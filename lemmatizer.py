@@ -8,7 +8,7 @@ nltk.download('stopwords')
 nltk.download('punkt')
 lemma = WordNetLemmatizer()
 
-cList = {
+contractions_list = {
   "ain't": "am not",
   "aren't": "are not",
   "can't": "cannot",
@@ -131,13 +131,15 @@ cList = {
 
 subjects = {"i", "you", "he", "she", "it", "we", "they"}
 
-c_re = re.compile('(%s)' % '|'.join(cList.keys()))
+c_re = re.compile('(%s)' % '|'.join(contractions_list.keys()))
 
+'''Given a text and a list of common contractions, this method replaces each contraction and adds its expanded form.'''
 def expand_contractions(text, c_re=c_re):
     def replace(match):
-        return cList[match.group(0)]
+        return contractions_list[match.group(0)]
     return c_re.sub(replace, text.lower())
 
+'''Given a list of words, we remove the subjects from it and return a new list without subjects.'''
 def remove_subjects(list):
     list_without_subjects = []
     for item in list:
@@ -145,6 +147,7 @@ def remove_subjects(list):
             list_without_subjects.append(item)
     return list_without_subjects
 
+'''Given a string, we remove the punctuation symbols such as dots, commas, quotation marks, hashtags... and return a new string without punctuation symbols.'''
 def remove_punctuation(string):
     punctuation = '''!()-[]{};:`'"\, <>./?@#$%^&*_~—'''
     for ele in string:  
@@ -152,6 +155,8 @@ def remove_punctuation(string):
             string = string.replace(ele, "") 
     return string
 
+'''Given a path to a file, we open the file and read its content. For each line in the file, we expand contractions, tokenize the text and remove stop words. 
+We return a filtered sentence list.'''
 def tokenize_text(path):
     stop_words = set(stopwords.words('english'))
     filtered_sentence = []
@@ -164,9 +169,11 @@ def tokenize_text(path):
                     filtered_sentence.append(w)
     return filtered_sentence 
 
+'''Given a word, we check if it exists in wordnet or not.'''
 def exists_in_wordnet(word):
     return len(wn.synsets(word)) > 0
-    
+
+'''Given an input word, we get its POS to know if it is a verb, noun, adjective...'''    
 def get_pos(input_word):
     # v = verb; n = noun; a = s = adjective; s = ; r = adverb; 
     synset = wn.synsets(input_word)
@@ -178,6 +185,7 @@ def get_pos(input_word):
         pos.add(s[1])
     return pos
 
+'''Given an input word, we check if it exists in wordnet or not.'''    
 def exists_as_is(input_word):
     synsets = wn.synsets(input_word)
     exists = False
@@ -190,14 +198,17 @@ def exists_as_is(input_word):
         i = i+1
     return exists
 
+'''Given an input word, we check if it is a verb or not.'''   
 def is_verb(input_word):
     pos = get_pos(input_word)
     return 'v' in pos
 
+'''Given an input word, we check if it is a noun or not.'''  
 def is_noun(input_word):
     pos = get_pos(input_word)
     return 'n' in pos
 
+'''Given a list of words, we lemmatize the whole list and return a list with lemmatized words, excluding those that don't exist after lemmmatizing.'''  
 def lemmatize_list(list):
     result = []
     for word in list:
@@ -206,6 +217,7 @@ def lemmatize_list(list):
             result.append(lemmatized)
     return result
 
+'''Given a word, we lemmatize it and return it to the user.'''  
 def lemmatizer(input_word):
     result = lemma.lemmatize(input_word)
     return result
@@ -217,21 +229,24 @@ def lemmatize(input_word):
     
 '''
 
+'''Given a word, we lemmatize it as a verb and return it to the user.''' 
 def lemmatize_as_verb(input_word):
     m = wn.morphy(input_word, wn.VERB)
     return m
 
+'''Given a word, we lemmatize it as a noun and return it to the user.''' 
 def lemmatize_as_noun(input_word):
     m = wn.morphy(input_word, wn.NOUN)
     return m
 
+'''Given a word, we check if it is plural or not.''' 
 def is_plural(word):
     lemma = wn.morphy(word, 'n')
     plural = True if word is not lemma else False
     return plural
 
+'''Given a word, we process it with wordnet multiple lemmatizing. First as a verb, then as a noun. It returns None if after lemmatization the word doesnt exist.''' 
 def process_with_wordnet_multiple_lemmatizing(input_word):
-    # we lemmatize each word as noun and verb
     result = []
     word = lemmatize_as_verb(input_word)
     if word != None:
@@ -239,15 +254,17 @@ def process_with_wordnet_multiple_lemmatizing(input_word):
     word = lemmatize_as_noun(input_word)
     if word != None:
         result.append(word)
-    return result # it will return None if after lemmatization the word doesnt exist
+    return result 
 
+'''Given a list of words we remove verbs and nouns from it and return a new list without verbs and nouns.'''
 def remove_verbs(list):
     result = []
     for w in list:
         if not (is_verb(w) and (not is_noun(w))):
             result.append(w)
     return result
-    
+
+'''Given a list of words we remove plurals from it and return a new list without plurals.'''    
 def remove_plurals(list):
     result = []
     for w in list:
@@ -255,5 +272,6 @@ def remove_plurals(list):
             result.append(w)
     return result
 
+'''Given a list of words, for each word in the list, we write it lowercase and return a list containing lowercase words.'''
 def lower(x):
     return [element.lower() for element in x] ; 

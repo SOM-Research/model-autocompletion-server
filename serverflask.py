@@ -6,7 +6,7 @@ import recommender as recommendations
 import lemmatizer as lemmas
 import re
 
-
+'''Given an string cointaining slices (positive concepts) using this format: term1,term2,term3;slice2term1,slice2term2... We split this string and put each word inside a list.'''
 def process_concepts(concepts):
     concepts_without_semicolon = re.split(';', concepts)
     result = []
@@ -15,10 +15,12 @@ def process_concepts(concepts):
         result.append(list_without_commas)
     return result
 
+'''Given an string cointaining negative concepts using this format: term1,term2,term3... We split this string and put each word inside a list.'''
 def process_negative_concepts(negative_concepts):
     concepts_without_commas = re.split(',', negative_concepts)  
     return concepts_without_commas
 
+'''Given a path to a GloVe embeddings dictionary, we open the file and we put each entry of the file inside an embeddings dictionary. The embeddings dictionary is returned.'''
 def load_glove(path):
     embeddings_dict = {}
     with open(path, 'r', encoding='utf-8') as f:
@@ -30,6 +32,7 @@ def load_glove(path):
     print("GloVe Embeddings loaded")
     return embeddings_dict
 
+'''Class that allows our app to have a custom URL prefix.'''
 class PrefixMiddleware(object):
  
     def __init__(self, app, prefix=''):
@@ -45,7 +48,9 @@ class PrefixMiddleware(object):
         else:
             start_response('404', [('Content-Type', 'text/plain')])
             return ["This url does not belong to the app.".encode()]
- 
+
+'''Class that allows our app to load general and contextual embeddings when the server starts. 
+Both embeddings dictionaries are stored in global variables to be used in the different server queries.''' 
 class MyFlaskApp(Flask):
   def run(self, host=None, port=None, debug=None, load_dotenv=True, **options):
     if not self.debug or os.getenv('WERKZEUG_RUN_MAIN') == 'true':
@@ -56,12 +61,12 @@ class MyFlaskApp(Flask):
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
 
-#UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER
-UPLOAD_FOLDER = '/files/'
+UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the files pre-processed.
+#UPLOAD_FOLDER = '/files/'
 ALLOWED_EXTENSIONS = {'txt'}
 
 app = MyFlaskApp(__name__)
-my_prefix = '/model-autocompletion' # Change to the URL prefix you need
+my_prefix = '/model-autocompletion' #This is our custom URL prefix.
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=my_prefix)
 
@@ -70,15 +75,20 @@ app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=my_prefix)
 def index():
     return '<h1>I am the Flask Server, currently running</h1>'
 
+'''Given a the file's name and the path to look for the file, we get the file's location.'''
 def find(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
             return os.path.join(root, name)
 
+'''Given a filename, we check if its extension is one of our allowed extensions: e.g. suppose a file called: text.txt it will return True because txt is one of the allowed extensions.'''
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+'''Using a post request, the user sends a file to our server in order to be pre-processed. Our algorithm checks if the post request has the file. If the user did not select a file,
+the browser submits an empty file without a filename. Instead, if the user selected a file, it is stored in the upload folder to make pre-processing easier. As pre-processing also takes
+place here, we tokenize the text, remove punctuation and subjects from the list.'''
 @app.route('/pre-process-text', methods=['POST'])
 def preprocessing():
     if request.method == 'POST':
@@ -95,27 +105,23 @@ def preprocessing():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(UPLOAD_FOLDER, filename))
-            print('Saved')
             path = find(filename, UPLOAD_FOLDER)
-            print(path)
 
             tokenized = lemmas.tokenize_text(path) #tokenizing text
             tokenized = [lemmas.remove_punctuation(i) for i in tokenized] #removing punctuation symbols from the tokenized text
-            #tokenized = lemmas.lower(tokenized)
             filtered_and_tokenized = [elem for elem in tokenized if elem != ''] #removing empty elements from the list
-            print("After removing punctuation and empty elements")
-            print(filtered_and_tokenized)
 
             filtered_tokenized_no_subjects = lemmas.remove_subjects(filtered_and_tokenized) #removing subjects from the list
-            print("After removing subjects the content is:")
-            print(filtered_tokenized_no_subjects)
             #TO DO: WHEN DO WE DO LEMMATIZATION?
             #lemmatized_list = lemmas.lemmatize_list(filtered_and_tokenized)
             #print("Now it has been lemmatized")
             #print(lemmatized_list)
-    return ''' DONE '''
-#TO DO: DECIDE WHAT TO DO WITH RETURN    
+    return ''' DONE '''   
 
+'''When the user sends us a get request, he/she specifies the model he/she wants to get suggestions from, 
+the positive and negative concepts, the number of suggestions required and if he/she wants suggestions together 
+in case he/she wants suggestions from both sources of knowledge.
+Given those parameters and once we check if concepts lists are not empty, we find general, contextual or both type of suggestions and show them to the user.'''
 @app.route('/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>')
 def query(model, positive_concepts, negative_concepts, number, together):
     suggestions = []
@@ -159,15 +165,17 @@ def query(model, positive_concepts, negative_concepts, number, together):
         
     return '<h1>Log: {}</h1>'.format(log) + result
 
+'''Given the positive and negative concepts lists and the number of suggestions the user wants, 
+we get suggestions from the general embeddings dictionary loaded when the server started running.'''
 def find_general_suggestions(positive_concepts, negative_concepts, number):
     suggestions = []
     for slice in positive_concepts:
         suggestions = recommendations.get_suggestions(general_embeddings_dict, slice, negative_concepts, number)
     return suggestions[:number] 
 
+'''Given the positive and negative concepts lists and the number of suggestions the user wants, 
+we get suggestions from the contextual embeddings dictionary loaded when the server started running.'''
 def find_contextual_suggestions(positive_concepts, negative_concepts, number):
-    #Positive concepts come from a partial model
-    #Negative concepts are just words
     suggestions = []
     for slice in positive_concepts:
         suggestions = recommendations.get_suggestions(contextual_embeddings_dict, slice, negative_concepts, number)

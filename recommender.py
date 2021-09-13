@@ -1,10 +1,13 @@
 from scipy import spatial 
 from collections import OrderedDict
 import lemmatizer as lemmas
-    
+
+'''Given an embeddings dictionary and a embedding, we find the closest embeddings to it using the embeddings dictionary provided and return a sorted embeddings list.'''
 def find_closest_embeddings(glove_emb_dict, embedding):
     return sorted(glove_emb_dict.keys(), key=lambda token: spatial.distance.euclidean(glove_emb_dict[token], embedding))    
 
+'''Given an embeddings dictionary, a positive concepts list, a negative concepts list (terms we do not want to get suggestions related to them) and the number of suggestions we want,
+we find the closest concepts to them using the embeddings dictionary provided and return a list of closest terms found.'''
 def find_closest_concepts(glove_emb_dict, positiveconcepts, negativeconcepts, num):
     try:
         concepts_number = 2*num
@@ -21,7 +24,8 @@ def find_closest_concepts(glove_emb_dict, positiveconcepts, negativeconcepts, nu
     except Exception as e:
         print("No embeddings found")
     
-        
+'''Given an embeddings dictionary, a positive concepts list, a negative concepts list (terms we do not want to get suggestions related to them) and the number of suggestions we want,
+we get glove suggestions through queries to the NLP Model.'''        
 def get_glove_recommendations(glove_emb_dict, positiveconcepts, negativeconcepts, num):
     """
     Given a list of words, we don't only compute the closest words to the whole set, but also to its subsets,
@@ -51,7 +55,10 @@ def get_glove_recommendations(glove_emb_dict, positiveconcepts, negativeconcepts
             recomm = recomm + concepts
     return recomm
 
-
+'''Given an embeddings dictionary, a positive concepts list, a negative concepts list (terms we do not want to get suggestions related to them) and the number of suggestions we want,
+we get glove suggestions through queries to the NLP Model. Before querying the model, we convert each positive concept lowercase and after getting GloVe suggestions we process 
+recommendations with multiple lemmatizing, remove duplicate words from the suggestions list and remove words that belong to the negative words list. 
+As part of lemmatizing we remove verbs and plurals from the suggestions list.'''  
 def get_suggestions(glove_emb_dict, positiveconcepts, negativeconcepts, num):
     concepts = lemmas.lower(positiveconcepts)
     glove_suggestions = get_glove_recommendations(glove_emb_dict, concepts, negativeconcepts, num)
