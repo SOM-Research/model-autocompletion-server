@@ -173,6 +173,17 @@ def training():
     #TO DO: STORE THE RESULT AS CONTEXTUAL_EMBEDDINGS_DICTIONARY?
     return '''TRAINED'''
 
+@app.route('/testing-lists')
+def testing():
+    list = ['pineaple', 'banana', 'classical items']
+    list2 = ['Antonio', 'Lola', 'Maria']
+    return '{}/{}'.format(list, list2) 
+
+@app.route('/testing-lists2')
+def testing2():
+    list = ['pineaple', 'banana', 'classical items']
+    return '{}'.format(list)
+
 '''When the user sends us a get request, he/she specifies the model he/she wants to get suggestions from, 
 the positive and negative concepts, the number of suggestions required and if he/she wants suggestions together 
 in case he/she wants suggestions from both sources of knowledge.
@@ -195,29 +206,34 @@ def query(model, positive_concepts, negative_concepts, number, together):
     if model == "general" and positive_concepts_processed and number: 
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if suggestions:
-            result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+            result = '{}'.format(suggestions)
         else:
             log = 'No suggestions were found in the general model'
     elif model == "contextual" and positive_concepts_processed and number:
         suggestions = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if suggestions:
-            result = '<h1>Suggestions are: {}</h1>'.format(suggestions)
+            result = '{}'.format(suggestions)
         else:
             log = 'No suggestions were found in the contextual model'
     elif model == "general;contextual" and positive_concepts_processed and together and number:
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if int(together) == 1:
-            result = '<h1>Suggestions are: {} length 1: {} length 2: {}</h1>'.format(suggestions + suggestions_second_model, len(suggestions), len(suggestions_second_model))
+            result = '{}'.format(suggestions + suggestions_second_model)
         else:
             if suggestions_second_model:
-                result = '<h1>Suggestions are: general: {}, contextual: {}</h1>'.format(suggestions, suggestions_second_model)
+                result = '{}/{}'.format(suggestions, suggestions_second_model)
             else:
-                result = '<h1>Suggestions are: general: {}</h1>'.format(suggestions)
+                result = '{}'.format(suggestions)
                 log = 'No suggestions were found in the contextual model' 
     else:
         log = "No model has been specified"
-        
-    return '<h1>Log: {}</h1>'.format(log) + result
+    end = ""
+    if len(log) > 0:
+        if len(suggestions) > 0 or len(suggestions_second_model) > 0:
+            end =  '/{}'.format(log)
+        else:
+            end = '{}'.format(log)     
+    return result + end 
 
 app.run(host='0.0.0.0', port=8080)
