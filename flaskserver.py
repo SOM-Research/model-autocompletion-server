@@ -114,9 +114,8 @@ class MyFlaskApp(Flask):
   def run(self, host=None, port=None, debug=None, load_dotenv=True, **options):
     if not self.debug or os.getenv('WERKZEUG_RUN_MAIN') == 'true':
       with self.app_context():
-        global general_embeddings_dict, contextual_embeddings_dict
+        global general_embeddings_dict
         general_embeddings_dict = load_glove("glove.6B.300d.txt")
-        contextual_embeddings_dict = load_glove("vectors_emasa_en.txt")
         clone_glove_repository()
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
@@ -171,6 +170,8 @@ def training():
     os.system("chmod +x demo.sh")
     os.system("./demo.sh")
     #TO DO: STORE THE RESULT AS CONTEXTUAL_EMBEDDINGS_DICTIONARY?
+    global contextual_embeddings_dict
+    contextual_embeddings_dict = load_glove("/glove/training.txt")
     return '''TRAINED'''
 
 @app.route('/testing-lists')

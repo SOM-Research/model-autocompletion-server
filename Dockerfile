@@ -3,7 +3,6 @@ ADD recommender.py .
 ADD flaskserver.py .
 ADD slices.py .
 ADD lemmatizer.py .
-ADD vectors_emasa_en.txt . 
 ADD glove.6B.300d.txt .
 RUN apt-get update && apt-get install --no-install-recommends -y python3.8 python3-pip python3.8-dev
 RUN pip install numpy
