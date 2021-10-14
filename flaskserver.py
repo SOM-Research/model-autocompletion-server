@@ -87,9 +87,12 @@ def find_general_suggestions(positive_concepts, negative_concepts, number):
 we get suggestions from the contextual embeddings dictionary loaded when the server started running.'''
 def find_contextual_suggestions(positive_concepts, negative_concepts, number):
     suggestions = []
-    for slice in positive_concepts:
-        suggestions = recommendations.get_suggestions(contextual_embeddings_dict, slice, negative_concepts, number)
-    return suggestions[:number]
+    if 'contextual_embeddings_dict' in globals():
+        for slice in positive_concepts:
+            suggestions = recommendations.get_suggestions(contextual_embeddings_dict, slice, negative_concepts, number)
+        return suggestions[:number]
+    else:
+        return ["No contextual embeddings loaded."]
 
 '''Class that allows our app to have a custom URL prefix.'''
 class PrefixMiddleware(object):
@@ -114,7 +117,7 @@ class MyFlaskApp(Flask):
   def run(self, host=None, port=None, debug=None, load_dotenv=True, **options):
     if not self.debug or os.getenv('WERKZEUG_RUN_MAIN') == 'true':
       with self.app_context():
-        global general_embeddings_dict
+        global general_embeddings_dict, contextual_embeddings_dict
         general_embeddings_dict = load_glove("glove.6B.300d.txt")
         clone_glove_repository()
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
@@ -169,8 +172,7 @@ def preprocessing():
 def training():
     os.system("chmod +x demo.sh")
     os.system("./demo.sh")
-    #TO DO: STORE THE RESULT AS CONTEXTUAL_EMBEDDINGS_DICTIONARY?
-    global contextual_embeddings_dict
+    #STORE THE RESULT AS CONTEXTUAL_EMBEDDINGS_DICTIONARY
     contextual_embeddings_dict = load_glove("/glove/training.txt")
     return '''TRAINED'''
 
