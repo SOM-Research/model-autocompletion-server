@@ -202,8 +202,9 @@ def query(model, positive_concepts, negative_concepts, number, together):
    
     if positive_concepts: #Positive concepts list is not empty
         positive_concepts_processed = process_concepts(positive_concepts)
-        
-    if negative_concepts: #Negative concepts list is not empty
+
+    print(negative_concepts)    
+    if negative_concepts and negative_concepts != "1": #User introduced negative concepts so the list is not empty
         negative_concepts_processed = process_negative_concepts(negative_concepts)
         
     if model == "general" and positive_concepts_processed and number: 
