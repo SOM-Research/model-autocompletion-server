@@ -149,7 +149,7 @@ def remove_subjects(list):
 
 '''Given a string, we remove the punctuation symbols such as dots, commas, quotation marks, hashtags... and return a new string without punctuation symbols.'''
 def remove_punctuation(string):
-    punctuation = '''!()-[]{};:`'"\, <>./?@#$%^&*_~—'''
+    punctuation = '''!()-[]{};:`'"\, <>./?@#$%^&*_~—‘’“”'''
     for ele in string:  
         if ele in punctuation:  
             string = string.replace(ele, "") 
