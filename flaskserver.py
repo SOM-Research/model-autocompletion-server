@@ -225,7 +225,15 @@ def query(model, positive_concepts, negative_concepts, number, together):
         suggestions_second_model = find_contextual_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if int(together) == 1:
             result = '{}'.format(suggestions + suggestions_second_model)
+            if not suggestions:
+                log = 'No suggestions were found in the general model' 
+            if not suggestions_second_model:
+                log = 'No suggestions were found in the contextual model' 
         else:
+            if not suggestions and suggestions_second_model:
+                result = '{}'.format(suggestions_second_model)
+                log = 'No suggestions were found in the general model'
+            
             if suggestions_second_model:
                 result = '{}/{}'.format(suggestions, suggestions_second_model)
             else:
