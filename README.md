@@ -27,7 +27,7 @@ Tool for the autocompletion of partial domain models.
 
 ### Requirements
 
-- You need to install Docker (version 20.10.7) on your computer. Ubuntu users follow this tutorial (steps 1-6): https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04 / Windows users follow this tutorial, it may not be available for Windows 10 Home users: https://www.youtube.com/watch?v=5nX8U8Fz5S0 
+- You need to install Docker (version 20.10.7) on your computer. Ubuntu users follow this tutorial (steps 1-6): https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04 / Windows users follow this tutorial. Windows 10 Home users should install Docker Desktop as  mentioned in this video: https://www.youtube.com/watch?v=5nX8U8Fz5S0. In case Windows 10 Home users experience some WSL errors, please check this page: https://docs.docker.com/desktop/windows/wsl/ in the prerequisites section the second point explains how to solve WSL errors.
 - Download GloVe's general embeddings dictionary from the official site: https://nlp.stanford.edu/projects/glove/ We use Wikipedia 2014 + Gigaword 5 (6B tokens, 400K vocab, uncased, 50d, 100d, 200d, & 300d vectors, 822 MB download), file name: ```glove.6B.zip```. Unzip the folder and copy the file ```glove.6B.300d.txt``` to the folder where this repository will be cloned.
 
 ### Installing
@@ -35,6 +35,7 @@ Tool for the autocompletion of partial domain models.
 Before starting this tutorial, make sure to have installed the software mentioned in the requirements section.
 
 If it's your first time using our repository, follow these steps:
+Before starting, Windows users should run Docker Desktop first. 
 1. Clone our repository.
 2. Open a command-line interpreter and navigate to the folder where this repository is located.
 3. Execute the command: ```docker build -t imageName .``` assign a name to the image that will be executed, for example, model-autocompletion. This command will run the content stored in Dockerfile. If it appears ```permissions denied```, execute: ```sudo chmod 666 /var/run/docker.sock```.
