@@ -177,17 +177,6 @@ def training():
     contextual_embeddings_dict = load_glove("/glove/contextual_knowledge_vectors.txt")
     return '''TRAINED'''
 
-@app.route('/testing-lists')
-def testing():
-    list = ['pineaple', 'banana', 'classical items']
-    list2 = ['Antonio', 'Lola', 'Maria']
-    return '{}/{}'.format(list, list2) 
-
-@app.route('/testing-lists2')
-def testing2():
-    list = ['pineaple', 'banana', 'classical items']
-    return '{}'.format(list)
-
 '''When the user sends us a get request, he/she specifies the model he/she wants to get suggestions from, 
 the positive and negative concepts, the number of suggestions required and if he/she wants suggestions together 
 in case he/she wants suggestions from both sources of knowledge.
