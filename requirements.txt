@@ -1,0 +1,13 @@
+anyascii
+click
+Flask
+itsdangerous
+Jinja2
+joblib
+MarkupSafe
+nltk
+numpy
+regex
+scipy
+tqdm
+Werkzeug
