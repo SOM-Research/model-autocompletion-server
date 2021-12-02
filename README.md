@@ -46,9 +46,9 @@ If it's your first time using our repository, follow these steps:
   - ```<negative_concepts>```: here you put the historical data (words discarded by the user) using the format: word1,word2,word3...
   - ```<number>```: you specify the number of suggestions you want.
   - ```<together>```: in case you want suggestions from both sources of knowledge, you have to specify here if you want to see the suggestions together or not. Possible values: ```1``` to see the suggestions together, ```0``` to see the suggestions provided by each source of knowledge.
-  Example query (Linux users): http://172.17.0.2:8080/model-autocompletion/general;contextual/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
-  Example query (Windows users): http://localhost:8080/model-autocompletion/general;contextual/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
-  Result: ![result](https://user-images.githubusercontent.com/50658372/127837543-9c0a5d91-dc88-41be-b07f-4543b9c7b43a.png)
+  Example query (Linux users): http://172.17.0.2:8080/model-autocompletion/general/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
+  Example query (Windows users): http://localhost:8080/model-autocompletion/general/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
+  Result: ![Result](https://user-images.githubusercontent.com/50658372/144405246-2aa19023-8ba6-4afc-94ad-dc204ffdb150.png)
 7. To go out of the internal command-line interpreter type: ```exit```
 8. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. 
 
