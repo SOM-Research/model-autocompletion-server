@@ -123,8 +123,8 @@ class MyFlaskApp(Flask):
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
 
-#UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the files pre-processed.
-UPLOAD_FOLDER = '/files/'
+UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the files pre-processed.
+#UPLOAD_FOLDER = '/files/'
 ALLOWED_EXTENSIONS = {'txt'}
 
 app = MyFlaskApp(__name__)
