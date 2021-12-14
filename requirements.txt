@@ -11,3 +11,5 @@ regex
 scipy
 tqdm
 Werkzeug
+pymongo
+dnspython

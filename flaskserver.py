@@ -7,6 +7,7 @@ import recommender as recommendations
 import lemmatizer as lemmas
 import re
 import shutil
+import mongoDB as db
 
 '''Given a path to a GloVe embeddings dictionary, we open the file and we put each entry of the file inside an embeddings dictionary. The embeddings dictionary is returned.'''
 def load_glove(path):
@@ -36,7 +37,6 @@ This method is only called once, when the server is started.'''
 def clone_glove_repository():
     if not path.isdir("glove"):
         os.system("git clone https://github.com/stanfordnlp/glove")
-        print("Repository cloned")
     else:
         print("It was already cloned")
 
@@ -123,8 +123,8 @@ class MyFlaskApp(Flask):
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
 
-UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the files pre-processed.
-#UPLOAD_FOLDER = '/files/'
+#UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the files pre-processed.
+UPLOAD_FOLDER = '/files/'
 ALLOWED_EXTENSIONS = {'txt'}
 
 app = MyFlaskApp(__name__)
@@ -136,6 +136,17 @@ app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix=my_prefix)
 @app.route('/')
 def index():
     return '<h1>I am the Flask Server, currently running</h1>'
+
+@app.route('/new/workspace', methods=['POST'])
+def new_workspace():
+    file_name = request.json.get('file_name')
+    workspace_name = request.json.get('workspace_name')
+    model_name = request.json.get('model_name')
+    model_tag = request.json.get('model_tag')
+
+    path = find_file_location(file_name, UPLOAD_FOLDER)
+    id = db.create_workspace(workspace_name, model_name, path, model_tag) 
+    return '''DONE'''
 
 '''Using a post request, the user sends a file to our server in order to be pre-processed. Our algorithm checks if the post request has the file. If the user did not select a file,
 the browser submits an empty file without a filename. Instead, if the user selected a file, it is stored in the upload folder to make pre-processing easier. As pre-processing also takes
@@ -158,12 +169,12 @@ def preprocessing():
             filename = secure_filename(file.filename)
             file.save(os.path.join(UPLOAD_FOLDER, filename))
             path = find_file_location(filename, UPLOAD_FOLDER)
-
+            
             tokenized = lemmas.tokenize_text(path) #tokenizing text
             tokenized = [lemmas.remove_punctuation(i) for i in tokenized] #removing punctuation symbols from the tokenized text
             filtered_and_tokenized = [elem for elem in tokenized if elem != ''] #removing empty elements from the list
             prepare_for_training(filtered_and_tokenized)
-
+            
             #filtered_tokenized_no_subjects = lemmas.remove_subjects(filtered_and_tokenized) removing subjects from the list, it may not be necessary to delete them
     return ''' PRE-PROCESSED '''   
 
@@ -239,3 +250,4 @@ def query(model, positive_concepts, negative_concepts, number, together):
     return result + end 
 
 app.run(host='0.0.0.0', port=8080)
+db.disconnect_database()
