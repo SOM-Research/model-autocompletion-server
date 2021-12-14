@@ -1,6 +1,6 @@
 import pymongo
 
-URL = "mongodb+srv://model-autocompletion:model-autocompletion@model-autocompletion-cl.wcpdc.mongodb.net/model-autocompletion-db?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
+URL = "mongodb+srv://model-autocompletion:model-autocompletion@model-autocompletion-cl.wcpdc.mongodb.net/model-autocompletion-db?retryWrites=true&w=majority&ssl=true"
 client = pymongo.MongoClient(URL)
 db = client.get_default_database()
 
