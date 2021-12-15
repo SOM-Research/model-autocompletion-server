@@ -153,6 +153,16 @@ def get_workspaces():
     workspaces = db.get_workspaces_available()
     return '{}'.format(workspaces)
 
+@app.route('/general/models/<workspace_name>', methods=['GET'])
+def get_general_models_workspace(workspace_name):
+    workspaces = db.get_general_models_trained_in_workspace(workspace_name)
+    return '{}'.format(workspaces)
+
+@app.route('/contextual/models/<workspace_name>', methods=['GET'])
+def get_contextual_models_workspace(workspace_name):
+    workspaces = db.get_contextual_models_trained_in_workspace(workspace_name)
+    return '{}'.format(workspaces)
+
 '''Using a post request, the user sends a file to our server in order to be pre-processed. Our algorithm checks if the post request has the file. If the user did not select a file,
 the browser submits an empty file without a filename. Instead, if the user selected a file, it is stored in the upload folder to make pre-processing easier. As pre-processing also takes
 place here, we tokenize the text, remove punctuation and subjects from the list. After pre-processing the text, we store the content in training.txt file
