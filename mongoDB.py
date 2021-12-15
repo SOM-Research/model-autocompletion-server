@@ -26,6 +26,12 @@ def get_contextual_models_trained_in_workspace(workspace_name):
 def get_workspaces_available():
     workspaces = workspace.distinct( "workspace_name")
     return workspaces 
-    
+
+def delete_contextual_model_workspace(workspace_name, contextual_model):
+    workspace.delete_one( { "workspace_name" : workspace_name, "model_name" : contextual_model, 'model_tag': "CONTEXTUAL" } )
+
+def delete_general_model_workspace(workspace_name, general_model):
+    workspace.delete_one( { "workspace_name" : workspace_name, "model_name" : general_model, 'model_tag': "GENERAL" } )
+
 def disconnect_database():
     client.close()

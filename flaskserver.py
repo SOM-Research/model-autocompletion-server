@@ -163,6 +163,16 @@ def get_contextual_models_workspace(workspace_name):
     workspaces = db.get_contextual_models_trained_in_workspace(workspace_name)
     return '{}'.format(workspaces)
 
+@app.route('/delete/contextual/<workspace_name>/<contextual_model>', methods=['GET'])
+def delete_contextual_model_workspace(workspace_name, contextual_model):
+    db.delete_contextual_model_workspace(workspace_name, contextual_model)
+    return '''DELETED CONTEXTUAL MODEL'''
+
+@app.route('/delete/general/<workspace_name>/<general_model>', methods=['GET'])
+def delete_general_model_workspace(workspace_name, general_model):
+    db.delete_general_model_workspace(workspace_name, general_model)
+    return '''DELETED GENERAL MODEL'''
+
 '''Using a post request, the user sends a file to our server in order to be pre-processed. Our algorithm checks if the post request has the file. If the user did not select a file,
 the browser submits an empty file without a filename. Instead, if the user selected a file, it is stored in the upload folder to make pre-processing easier. As pre-processing also takes
 place here, we tokenize the text, remove punctuation and subjects from the list. After pre-processing the text, we store the content in training.txt file
