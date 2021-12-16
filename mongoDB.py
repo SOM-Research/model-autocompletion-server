@@ -23,6 +23,15 @@ def get_contextual_models_trained_in_workspace(workspace_name):
         models.append(ws.get('model_name'))
     return models 
 
+def get_path_contextual_model_trained_in_workspace(workspace_name, contextual_model_name):
+    entry = workspace.find_one({'workspace_name': workspace_name, 'model_tag': "CONTEXTUAL", 'model_name':contextual_model_name}, { "path": 1, "_id": 0 })
+    return entry
+
+def get_path_general_model_trained_in_workspace(workspace_name, general_model_name):
+    entry = workspace.find_one({'workspace_name': workspace_name, 'model_tag': "GENERAL", 'model_name':general_model_name}, { "path": 1, "_id": 0 })
+    return entry
+
+
 def get_workspaces_available():
     workspaces = workspace.distinct( "workspace_name")
     return workspaces 

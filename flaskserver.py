@@ -144,7 +144,8 @@ def new_workspace():
     model_name = request.json.get('model_name')
     model_tag = request.json.get('model_tag')
 
-    path = find_file_location(file_name, UPLOAD_FOLDER)
+    path = find_file_location(model_name + '.txt', UPLOAD_FOLDER)
+    print(path)
     id = db.create_workspace(workspace_name, model_name, path, model_tag) 
     return '''DONE'''
 
@@ -204,21 +205,31 @@ def preprocessing():
     return ''' PRE-PROCESSED '''   
 
 '''When the user invokes this URL, we execute demo.sh file to train the text he/she has previously sent.'''
-@app.route('/train-corpus')
-def training():
+@app.route('/train-corpus/<model_name>')
+def training(model_name):
     os.system("chmod +x demo.sh")
     os.system("./demo.sh")
     #STORE THE RESULT AS CONTEXTUAL_EMBEDDINGS_DICTIONARY
     global contextual_embeddings_dict
     contextual_embeddings_dict = load_glove("/glove/contextual_knowledge_vectors.txt")
+    if os.path.exists("/opt/model-autocompletion-server/files/"):
+        # Change the current working Directory and copy our trained file (remote server)
+        shutil.copy2('contextual_knowledge_vectors.txt', '/opt/model-autocompletion-server/files/' + model_name + '.txt')   
+        os.chdir("/opt/model-autocompletion-server/files/")
+    elif os.path.exists("/files"):
+        # Change the current working Directory and copy our trained file (local server)
+        shutil.copy2('contextual_knowledge_vectors.txt', '/files/' + model_name + '.txt')   
+        os.chdir("/files")
     return '''TRAINED'''
 
 '''When the user sends us a get request, he/she specifies the model he/she wants to get suggestions from, 
 the positive and negative concepts, the number of suggestions required and if he/she wants suggestions together 
 in case he/she wants suggestions from both sources of knowledge.
 Given those parameters and once we check if concepts lists are not empty, we find general, contextual or both type of suggestions and show them to the user.'''
-@app.route('/<model>/<positive_concepts>/<negative_concepts>/<number>/<together>')
-def query(model, positive_concepts, negative_concepts, number, together):
+@app.route('/<model>/<workspace>/<general_model_name>/<contextual_model_name>/<positive_concepts>/<negative_concepts>/<number>/<together>')
+def query(model, workspace, general_model_name, contextual_model_name, positive_concepts, negative_concepts, number, together):
+    global general_embeddings_dict, contextual_embeddings_dict
+
     suggestions = []
     suggestions_second_model = []
     positive_concepts_processed = []
@@ -228,11 +239,30 @@ def query(model, positive_concepts, negative_concepts, number, together):
    
     if positive_concepts: #Positive concepts list is not empty
         positive_concepts_processed = process_concepts(positive_concepts)
-
-    print(negative_concepts)    
+  
     if negative_concepts and negative_concepts != "1": #User introduced negative concepts so the list is not empty
         negative_concepts_processed = process_negative_concepts(negative_concepts)
-        
+    
+    if os.path.exists("/opt/model-autocompletion-server/files/"):
+        if general_model_name != "--------------":
+            general_embeddings_dict = load_glove("/opt/model-autocompletion-server/files/" + general_model_name + ".txt")
+        if contextual_model_name !=  "--------------":
+            contextual_embeddings_dict = load_glove("/opt/model-autocompletion-server/files/" + contextual_model_name + ".txt")
+
+    elif os.path.exists("/files"):
+        if general_model_name != "--------------":
+            entry = db.get_path_general_model_trained_in_workspace(workspace, general_model_name)
+            print(type(entry))
+            print(entry)
+            print(entry.get('path'))
+            general_embeddings_dict = load_glove(entry.get('path'))
+        if contextual_model_name !=  "--------------":
+            entry = db.get_path_contextual_model_trained_in_workspace(workspace, contextual_model_name)
+            print(type(entry))
+            print(entry)
+            print(entry.get('path'))
+            contextual_embeddings_dict = load_glove(entry.get('path'))
+
     if model == "general" and positive_concepts_processed and number: 
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
         if suggestions:
