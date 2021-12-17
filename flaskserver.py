@@ -123,8 +123,8 @@ class MyFlaskApp(Flask):
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
 
-#UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the files pre-processed.
-UPLOAD_FOLDER = '/files/'
+UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the pre-processed files.
+#UPLOAD_FOLDER = '/files/'
 ALLOWED_EXTENSIONS = {'txt'}
 
 app = MyFlaskApp(__name__)
@@ -145,7 +145,6 @@ def new_workspace():
     model_tag = request.json.get('model_tag')
 
     path = find_file_location(model_name + '.txt', UPLOAD_FOLDER)
-    print(path)
     id = db.create_workspace(workspace_name, model_name, path, model_tag) 
     return '''DONE'''
 
@@ -252,15 +251,9 @@ def query(model, workspace, general_model_name, contextual_model_name, positive_
     elif os.path.exists("/files"):
         if general_model_name != "--------------":
             entry = db.get_path_general_model_trained_in_workspace(workspace, general_model_name)
-            print(type(entry))
-            print(entry)
-            print(entry.get('path'))
             general_embeddings_dict = load_glove(entry.get('path'))
         if contextual_model_name !=  "--------------":
             entry = db.get_path_contextual_model_trained_in_workspace(workspace, contextual_model_name)
-            print(type(entry))
-            print(entry)
-            print(entry.get('path'))
             contextual_embeddings_dict = load_glove(entry.get('path'))
 
     if model == "general" and positive_concepts_processed and number: 
@@ -285,15 +278,14 @@ def query(model, workspace, general_model_name, contextual_model_name, positive_
             if not suggestions_second_model:
                 log = 'No suggestions were found in the contextual model' 
         else:
-            if not suggestions and suggestions_second_model:
+            if not suggestions and suggestions_second_model: #Only there are suggestions in the contextual model
                 result = '{}'.format(suggestions_second_model)
                 log = 'No suggestions were found in the general model'
-            
-            if suggestions_second_model:
-                result = '{}/{}'.format(suggestions, suggestions_second_model)
-            else:
+            elif suggestions and not suggestions_second_model: #Only there are suggestions in the general model
                 result = '{}'.format(suggestions)
-                log = 'No suggestions were found in the contextual model' 
+                log = 'No suggestions were found in the contextual model'
+            elif suggestions and suggestions_second_model: #Both models contain suggestions
+                result = '{}/{}'.format(suggestions, suggestions_second_model)
     else:
         log = "No model has been specified"
     end = ""
