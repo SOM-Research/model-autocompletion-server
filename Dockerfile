@@ -2,6 +2,7 @@ FROM ubuntu:20.04
 ADD demo.sh . 
 ADD recommender.py .
 ADD flaskserver.py .
+ADD mongoDB.py .
 ADD lemmatizer.py .
 ADD glove.6B.300d.txt .
 ADD requirements.txt .
