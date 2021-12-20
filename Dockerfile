@@ -11,5 +11,5 @@ RUN apt-get update && apt-get install -y git
 RUN apt-get update && apt-get install -y gcc
 RUN apt-get install -y make
 RUN mkdir -p opt/model-autocompletion-server/files/
-ADD wikipedia.txt opt/model-autocompletion-server/files/
+ADD glove.6B.300d.txt opt/model-autocompletion-server/files/
 ADD emasa.txt opt/model-autocompletion-server/files/

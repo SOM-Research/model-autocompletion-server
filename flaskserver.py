@@ -118,7 +118,7 @@ class MyFlaskApp(Flask):
     if not self.debug or os.getenv('WERKZEUG_RUN_MAIN') == 'true':
       with self.app_context():
         global general_embeddings_dict
-        general_embeddings_dict = load_glove("/opt/model-autocompletion-server/files/wikipedia.txt")
+        general_embeddings_dict = load_glove("/opt/model-autocompletion-server/files/glove.6B.300d.txt")
         clone_glove_repository()
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
