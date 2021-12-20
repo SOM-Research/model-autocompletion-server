@@ -237,13 +237,12 @@ def query(model, workspace, general_model_name, contextual_model_name, positive_
     if negative_concepts and negative_concepts != "1": #User introduced negative concepts so the list is not empty
         negative_concepts_processed = process_negative_concepts(negative_concepts)
     
-    if os.path.exists("/opt/model-autocompletion-server/files/"):
-        if general_model_name != "--------------":
-            entry = db.get_path_general_model_trained_in_workspace(workspace, general_model_name)
-            general_embeddings_dict = load_glove(entry.get('path'))
-        if contextual_model_name !=  "--------------":
-            entry = db.get_path_contextual_model_trained_in_workspace(workspace, contextual_model_name)
-            contextual_embeddings_dict = load_glove(entry.get('path'))
+    if general_model_name != "--------------":
+        entry = db.get_path_general_model_trained_in_workspace(workspace, general_model_name)
+        general_embeddings_dict = load_glove(entry.get('path'))
+    if contextual_model_name !=  "--------------":
+        entry = db.get_path_contextual_model_trained_in_workspace(workspace, contextual_model_name)
+        contextual_embeddings_dict = load_glove(entry.get('path'))
 
     if model == "general" and positive_concepts_processed and number: 
         suggestions = find_general_suggestions(positive_concepts_processed, negative_concepts_processed, int(number))
