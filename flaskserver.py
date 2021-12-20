@@ -212,12 +212,8 @@ def training(model_name):
     contextual_embeddings_dict = load_glove("/glove/contextual_knowledge_vectors.txt")
     if os.path.exists("/opt/model-autocompletion-server/files/"):
         # Change the current working Directory and copy our trained file (remote server)
-        shutil.copy2('contextual_knowledge_vectors.txt', '/opt/model-autocompletion-server/files/' + model_name + '.txt')   
+        shutil.copy2('/glove/contextual_knowledge_vectors.txt', '/opt/model-autocompletion-server/files/' + model_name + '.txt')   
         os.chdir("/opt/model-autocompletion-server/files/")
-    elif os.path.exists("/files"):
-        # Change the current working Directory and copy our trained file (local server)
-        shutil.copy2('contextual_knowledge_vectors.txt', '/files/' + model_name + '.txt')   
-        os.chdir("/files")
     return '''TRAINED'''
 
 '''When the user sends us a get request, he/she specifies the model he/she wants to get suggestions from, 
@@ -242,12 +238,6 @@ def query(model, workspace, general_model_name, contextual_model_name, positive_
         negative_concepts_processed = process_negative_concepts(negative_concepts)
     
     if os.path.exists("/opt/model-autocompletion-server/files/"):
-        if general_model_name != "--------------":
-            general_embeddings_dict = load_glove("/opt/model-autocompletion-server/files/" + general_model_name + ".txt")
-        if contextual_model_name !=  "--------------":
-            contextual_embeddings_dict = load_glove("/opt/model-autocompletion-server/files/" + contextual_model_name + ".txt")
-
-    elif os.path.exists("/files"):
         if general_model_name != "--------------":
             entry = db.get_path_general_model_trained_in_workspace(workspace, general_model_name)
             general_embeddings_dict = load_glove(entry.get('path'))
