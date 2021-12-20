@@ -118,13 +118,12 @@ class MyFlaskApp(Flask):
     if not self.debug or os.getenv('WERKZEUG_RUN_MAIN') == 'true':
       with self.app_context():
         global general_embeddings_dict
-        general_embeddings_dict = load_glove("glove.6B.300d.txt")
+        general_embeddings_dict = load_glove("/opt/model-autocompletion-server/files/wikipedia.txt")
         clone_glove_repository()
     super(MyFlaskApp, self).run(host=host, port=port, debug=debug, load_dotenv=load_dotenv, **options)
 
 
-UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' #THIS UPLOAD FOLDER IS FOR REMOTE SERVER, inside it we store the pre-processed files.
-#UPLOAD_FOLDER = '/files/'
+UPLOAD_FOLDER = '/opt/model-autocompletion-server/files/' 
 ALLOWED_EXTENSIONS = {'txt'}
 
 app = MyFlaskApp(__name__)
