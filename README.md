@@ -11,7 +11,7 @@ Tool for the autocompletion of partial domain models.
 ### Requirements (local mode)
 
 - You need to install Docker (version 20.10.7) on your computer. Ubuntu users follow this tutorial (steps 1-6): https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04 / Windows users follow this tutorial. Windows 10 Home users should install Docker Desktop as  mentioned in this video: https://www.youtube.com/watch?v=5nX8U8Fz5S0. In case Windows 10 Home users experience some WSL errors, please check this page: https://docs.docker.com/desktop/windows/wsl/ in the prerequisites section the second point explains how to solve WSL errors.
-- Download GloVe's general embeddings dictionary from the official site: https://nlp.stanford.edu/projects/glove/ We use Wikipedia 2014 + Gigaword 5 (6B tokens, 400K vocab, uncased, 50d, 100d, 200d, & 300d vectors, 822 MB download), file name: ```glove.6B.zip```. Unzip the folder and rename the file ```glove.6B.300d.txt``` to ```wikipedia.txt``` and copy it to the folder where this repository will be cloned.
+- Download GloVe's general embeddings dictionary from the official site: https://nlp.stanford.edu/projects/glove/ We use Wikipedia 2014 + Gigaword 5 (6B tokens, 400K vocab, uncased, 50d, 100d, 200d, & 300d vectors, 822 MB download), file name: ```glove.6B.zip```. Unzip the folder and copy the file ```glove.6B.300d.txt```  to the folder where this repository will be cloned.
 
 ### Installing (local mode)
 
@@ -31,9 +31,9 @@ Before starting, Windows users should run Docker Desktop first.
   - ```<negative_concepts>```: here you put the historical data (words discarded by the user) using the format: word1,word2,word3...
   - ```<number>```: you specify the number of suggestions you want.
   - ```<together>```: in case you want suggestions from both sources of knowledge, you have to specify here if you want to see the suggestions together or not. Possible values: ```1``` to see the suggestions together, ```0``` to see the suggestions provided by each source of knowledge.
-  Example query (Linux users): http://172.17.0.2:8080/model-autocompletion/general/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
-  Example query (Windows users): http://localhost:8080/model-autocompletion/general/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
-  Result: ![Result](https://user-images.githubusercontent.com/50658372/144405246-2aa19023-8ba6-4afc-94ad-dc204ffdb150.png)
+  Example query (Linux users): http://172.17.0.2:8080/model-autocompletion/general/default-ws/glove.6B.300d/--------------/Test;Exam/1/5/1
+  Example query (Windows users): http://localhost:8080/model-autocompletion/general/default-ws/glove.6B.300d/--------------/Test;Exam/1/5/1
+  Result: ![Result](https://user-images.githubusercontent.com/50658372/146758665-93728a27-6e57-4d9d-86d0-d87dc5cda9ec.png)
 7. To go out of the internal command-line interpreter type: ```exit```
 8. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. 
 
@@ -70,7 +70,7 @@ If you already did the steps mentioned in the previous section, follow these one
     sudo mv download general.zip
     sudo unzip general.zip
  ```
-and move the file glove.6B.300d.txt to the repo folder. Rename the file to wikipedia.txt
+and move the file glove.6B.300d.txt to the repo folder.
 
 ### Usage (remote mode)
 
@@ -90,11 +90,11 @@ If you already did the steps mentioned in the previous section, follow these one
     sudo mv download general.zip
     sudo unzip general.zip
  ```
-and move the file glove.6B.300d.txt to the repo folder. Rename the file to wikipedia.txt.
+and move the file glove.6B.300d.txt to the repo folder. 
 
 8. Now it's time to run the service. To do so, we type the command ``` sudo systemctl start model-autocompletion.service ```
 9. The service may take a while to start working (1 minute max in our case). You can get to know the service status using the command ``` sudo systemctl status model-autocompletion.service ```
-10. After it starts, it is possible to make queries in your browser. An example query would be: https://som-research.uoc.edu/model-autocompletion/general/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hola/7/1 
+10. After it starts, it is possible to make queries in your browser. An example query would be: https://som-research.uoc.edu/model-autocompletion/general/default-ws/glove.6B.300d/--------------/Test;Exam/1/5/1
 11. To stop the running service the right command is ``` sudo systemctl stop model-autocompletion.service ```
 In case you want to restart it, execute the command ``` sudo systemctl restart model-autocompletion.service ```
 12. Finally, to close the SSH session, execute ```exit``` and it will shut down the console. 
@@ -104,7 +104,7 @@ In case you want to restart it, execute the command ``` sudo systemctl restart m
 ### Requirements
 
 - You need to install Docker (version 20.10.7) on your computer. Ubuntu users follow this tutorial (steps 1-6): https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04 / Windows users follow this tutorial. Windows 10 Home users should install Docker Desktop as  mentioned in this video: https://www.youtube.com/watch?v=5nX8U8Fz5S0. In case Windows 10 Home users experience some WSL errors, please check this page: https://docs.docker.com/desktop/windows/wsl/ in the prerequisites section the second point explains how to solve WSL errors.
-- Download GloVe's general embeddings dictionary from the official site: https://nlp.stanford.edu/projects/glove/ We use Wikipedia 2014 + Gigaword 5 (6B tokens, 400K vocab, uncased, 50d, 100d, 200d, & 300d vectors, 822 MB download), file name: ```glove.6B.zip```. Unzip the folder and rename the file ```glove.6B.300d.txt``` to ```wikipedia.txt``` and copy it to the folder where this repository will be cloned.
+- Download GloVe's general embeddings dictionary from the official site: https://nlp.stanford.edu/projects/glove/ We use Wikipedia 2014 + Gigaword 5 (6B tokens, 400K vocab, uncased, 50d, 100d, 200d, & 300d vectors, 822 MB download), file name: ```glove.6B.zip```. Unzip the folder and copy the file ```glove.6B.300d.txt``` to the folder where this repository will be cloned.
 
 ### Installing
 
@@ -126,9 +126,10 @@ Before starting, Windows users should run Docker Desktop first.
   - ```<negative_concepts>```: here you put the historical data (words discarded by the user) using the format: word1,word2,word3...
   - ```<number>```: you specify the number of suggestions you want.
   - ```<together>```: in case you want suggestions from both sources of knowledge, you have to specify here if you want to see the suggestions together or not. Possible values: ```1``` to see the suggestions together, ```0``` to see the suggestions provided by each source of knowledge.
-  Example query (Linux users): http://172.17.0.2:8080/model-autocompletion/general/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
-  Example query (Windows users): http://localhost:8080/model-autocompletion/general/Supervisor;Order,subordinate,create,assigned,history,status;Worker,name/hello,bye,nice/10/0
-  Result: ![Result](https://user-images.githubusercontent.com/50658372/144405246-2aa19023-8ba6-4afc-94ad-dc204ffdb150.png)
+  Example query (Linux users): http://172.17.0.2:8080/model-autocompletion/general/default-ws/glove.6B.300d/--------------/Test;Exam/1/5/1
+  Example query (Windows users): http://localhost:8080/model-autocompletion/general/default-ws/glove.6B.300d/--------------/Test;Exam/1/5/1
+  Result: ![Result](https://user-images.githubusercontent.com/50658372/146758665-93728a27-6e57-4d9d-86d0-d87dc5cda9ec.png)
+
 7. To go out of the internal command-line interpreter type: ```exit```
 8. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. 
 
