@@ -35,7 +35,7 @@ Before starting, Windows users should run Docker Desktop first.
   Example query (Windows users): http://localhost:8080/model-autocompletion/general/default-ws/glove.6B.300d/--------------/Test;Exam/1/5/1
   Result: ![Result](https://user-images.githubusercontent.com/50658372/146758665-93728a27-6e57-4d9d-86d0-d87dc5cda9ec.png)
 7. To go out of the internal command-line interpreter type: ```exit```
-8. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. 
+8. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. If you want to know your container's ID, execute the command ```docker ps -a```. This will list your containers and the relevant information like the container ID, name, status...
 
 ### Usage (local mode)
 
@@ -46,6 +46,7 @@ If you already did the steps mentioned in the previous section, follow these one
  4. To go out of the internal command-line interpreter type: ```exit```
  5. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. 
 
+In case you want to know your container's ID, execute the command ```docker ps -a```. This will list your containers and the relevant information like the container ID, name, status...
 
 ### Requirements (remote mode)
 
@@ -132,6 +133,8 @@ Before starting, Windows users should run Docker Desktop first.
 
 7. To go out of the internal command-line interpreter type: ```exit```
 8. If you want to stop the container's execution: ```docker stop containerID``` This command changes the execution of the current container and changes its status from Up to Exited. 
+
+To know your container's ID, execute the command ```docker ps -a```. This will list your containers and the relevant information like the container ID, name, status...
 
 ### Usage  
   If you already did the steps mentioned in the previous section, follow these ones:
